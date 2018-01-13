@@ -162,27 +162,6 @@ if __name__ == '__main__':
 	heuristics = Heuristic(portals, target, discrete_distribution)
 
 	solver = A_Star(universe, portals, start, target, discrete_distribution)
-	#solver.explore(heuristics.probabilistic_manhattan, probabilistic=True, print_path=True)
-	#solver.print_universe()
 	
-	"""
-	for task_index in (1, 2, 3):
-		settings = task_requirements(task_index, heuristics, portals, discrete_distribution)
-		probabilistic, heuristic, portals = settings[0], settings[1], settings[2]
-
-		heuristics.portals = portals
-		solver.portals = portals
-
-		print('Task', task_index, ':')
-
-		val = solver.explore(h=heuristic, probabilistic=probabilistic, print_path=True)
-		print(val)
-		
-		solver.restore_data()
-		heuristics.restore_data()
-
-		print('--------------------------------------------------------------------------------')
-	"""
-
 	report = make_statistics(solver, heuristics, discrete_distribution)
 	print(report)
