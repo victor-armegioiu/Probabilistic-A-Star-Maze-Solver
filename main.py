@@ -4,6 +4,7 @@ from utilities import *
 from random import random
 from reader import load_maze
 from probability import DiscreteDistribution
+from copy import deepcopy
 
 X_DEST = 0
 Y_DEST = 1
@@ -12,12 +13,12 @@ PROBABILITY = 2
 class Heuristic:
 	def __init__(self, portals, target, discrete_distribution):
 		self.portals = portals
-		self.original_portals = portals
+		self.original_portals = deepcopy(portals)
 		self.target = target
 		self.discrete_distribution = discrete_distribution
 
 	def restore_data(self):
-		self.portals = self.original_portals
+		self.portals = deepcopy(self.original_portals)
 
 	def manhattan_distance(self, node):
 		return abs(node[0] - self.target[0]) + abs(node[1] - self.target[1])
@@ -61,8 +62,8 @@ class Heuristic:
 class A_Star:
 	def __init__(self, universe, portals, start, target, discrete_distribution):
 		self.universe = universe
-		self.original_universe = universe
-		self.original_portals = portals
+		self.original_universe = deepcopy(universe)
+		self.original_portals = deepcopy(portals)
 		self.portals = portals
 
 		self.height = len(universe)
@@ -78,8 +79,8 @@ class A_Star:
 			print(line)
 
 	def restore_data(self):
-		self.universe = self.original_universe
-		self.portals = self.original_portals
+		self.universe = deepcopy(self.original_universe)
+		self.portals = deepcopy(self.original_portals)
 
 	def is_good(self, pos):
 	    line = pos[0]
@@ -134,14 +135,15 @@ class A_Star:
 				heappush(frontier, (discovered[v][1] + h(v), v))
 
 		mark_map(self.universe)
-		#print('Cost from start to target:', discovered[self.target][1])
-
+	
 		if print_path:
+			print('Path cost is', discovered[target][1])
 			stack = []
 			curr = target
 
 			while curr:
-				stack.append(curr)
+				stack.append((curr, self.original_universe[curr[0]][curr[1]]))
+				print(curr)
 				curr = discovered[curr][0]
 
 			print('Path from start to target:', stack[::-1])
@@ -160,8 +162,10 @@ if __name__ == '__main__':
 	heuristics = Heuristic(portals, target, discrete_distribution)
 
 	solver = A_Star(universe, portals, start, target, discrete_distribution)
+	#solver.explore(heuristics.probabilistic_manhattan, probabilistic=True, print_path=True)
+	#solver.print_universe()
 	
-
+	"""
 	for task_index in (1, 2, 3):
 		settings = task_requirements(task_index, heuristics, portals, discrete_distribution)
 		probabilistic, heuristic, portals = settings[0], settings[1], settings[2]
@@ -171,13 +175,14 @@ if __name__ == '__main__':
 
 		print('Task', task_index, ':')
 
-		val = solver.explore(h=heuristic, probabilistic=probabilistic)
+		val = solver.explore(h=heuristic, probabilistic=probabilistic, print_path=True)
 		print(val)
-		#solver.print_universe()
+		
 		solver.restore_data()
 		heuristics.restore_data()
 
 		print('--------------------------------------------------------------------------------')
+	"""
 
-	#report = make_statistics(solver, heuristics, discrete_distribution)
-	#print(report)
+	report = make_statistics(solver, heuristics, discrete_distribution)
+	print(report)
